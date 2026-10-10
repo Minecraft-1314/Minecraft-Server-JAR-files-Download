@@ -1,0 +1,42 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Minecraft Server Downloader" Manufacturer="Minecraft-1314" Version="$(var.ProductVersion)" ProductCode="{E9E81633-7E63-4E85-8133-7B479D5D5F86}" UpgradeCode="{7A3BB87B-7B8F-41BE-96D2-7FCB24C70F9B}" Scope="perMachine" Compressed="yes">
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="mszip" />
+    <Icon Id="AppIcon" SourceFile="$(var.IconSource)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="MinecraftServerDownloader">
+        <Component Id="AppRuntime" Guid="{A5198756-4F2B-4FB2-B41D-52D2F1D27B79}">
+          <File Id="AppExe" Source="$(var.AppSource)\MinecraftServerDownloader.exe" KeyPath="yes" />
+          <File Source="$(var.AppSource)\WebView2Loader.dll" />
+          <File Source="$(var.AppSource)\app.ico" />
+        </Component>
+        <Directory Id="UiFolder" Name="Ui">
+          <Directory Id="UiWebFolder" Name="Web">
+            <Component Id="UiWeb" Guid="{BFC7DA56-E1D1-44F0-8B48-C5F1A98B3D4F}">
+              <File Id="UiIndex" Source="$(var.AppSource)\Ui\Web\index.html" KeyPath="yes" />
+              <File Source="$(var.AppSource)\Ui\Web\styles.css" />
+              <File Source="$(var.AppSource)\Ui\Web\app.js" />
+              <File Source="$(var.AppSource)\Ui\Web\i18n.js" />
+              <File Source="$(var.AppSource)\Ui\Web\lucide.min.js" />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut" Guid="{F15DB30E-18EC-48D3-8D20-46D49B0C1E69}">
+        <Shortcut Id="StartMenuShortcutLink" Name="Minecraft Server Downloader" Target="[INSTALLFOLDER]MinecraftServerDownloader.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveStartMenuFolder" Directory="ProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\MinecraftServerDownloader" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+    <Feature Id="Main" Title="Minecraft Server Downloader" Level="1">
+      <ComponentRef Id="AppRuntime" />
+      <ComponentRef Id="UiWeb" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+  </Package>
+</Wix>

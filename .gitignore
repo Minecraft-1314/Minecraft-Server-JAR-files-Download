@@ -1,0 +1,15 @@
+bin/
+obj/
+node_modules/
+.packages/
+.dotnet/
+.playwright/
+publish/
+standalone/
+work/
+*.user
+*.suo
+*.log
+*.tmp
+*.wixpdb
+

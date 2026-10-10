@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MinecraftServerDownloader</AssemblyName>
+    <RootNamespace>MinecraftServerDownloader</RootNamespace>
+    <Product>Minecraft Server Downloader</Product>
+    <Version>0.0.1</Version>
+    <FileVersion>0.0.1.0</FileVersion>
+    <InformationalVersion>0.0.1</InformationalVersion>
+    <AssemblyTitle>Minecraft Server Downloader</AssemblyTitle>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DebugType>none</DebugType>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tests\**;src\**;Uninstaller\**;tools\**;.tools\**;.packages\**;.dotnet\**;work\**;dist\**;publish\**;standalone\**" />
+    <None Remove="Tests\**;src\**;Uninstaller\**;.tools\**;.packages\**;.dotnet\**;work\**;dist\**;publish\**;standalone\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="src\MinecraftServerDownloader.Core\MinecraftServerDownloader.Core.csproj" />
+    <None Include="Ui\Web\index.html;Ui\Web\styles.css;Ui\Web\app.js;Ui\Web\i18n.js;Ui\Web\lucide.min.js" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="app.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3405.78" />
+  </ItemGroup>
+</Project>
+
+
