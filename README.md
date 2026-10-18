@@ -2,7 +2,7 @@
 
 ## 重要公告（必读）
 
-- 本项目面向 Windows 10/11 x64，使用 Rust 重写，不再需要 .NET 运行时。
+- 本项目面向 Windows 10/11 x64。
 - 所有版本都需要 Microsoft Edge WebView2 Runtime。
 - 安装程序尚未使用代码签名证书，Windows SmartScreen 可能显示安全提示。
 - 请勿在日志、问题反馈或截图中粘贴任何私密信息。
