@@ -33,11 +33,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\dist\MinecraftServerDownloader-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\target\release\uninstall.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Minecraft Server Downloader"; Filename: "{app}\MinecraftServerDownloader.exe"
-Name: "{group}\Uninstall Minecraft Server Downloader"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Minecraft Server Downloader"; Filename: "{app}\MinecraftServerDownloader.exe"; Tasks: desktopicon
+Name: "{group}\Minecraft Server Downloader"; Filename: "{app}\MinecraftServerDownloader.exe"; IconFilename: "{app}\app.ico"
+Name: "{group}\Uninstall Minecraft Server Downloader"; Filename: "{uninstallexe}"; IconFilename: "{app}\app.ico"
+Name: "{autodesktop}\Minecraft Server Downloader"; Filename: "{app}\MinecraftServerDownloader.exe"; IconFilename: "{app}\app.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\MinecraftServerDownloader.exe"; Description: "{cm:LaunchProgram,Minecraft Server Downloader}"; Flags: nowait postinstall skipifsilent

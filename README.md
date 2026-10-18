@@ -18,7 +18,6 @@
 | `MinecraftServerDownloader-Setup.exe` | Inno Setup 标准安装向导，支持中文和英文 | Windows 10/11 x64，安装时需要管理员权限 |
 | `MinecraftServerDownloader.msi` | 标准 Windows Installer 安装包 | Windows 10/11 x64，安装时需要管理员权限 |
 | `MinecraftServerDownloader-portable-win-x64.zip` | 便携版压缩包，解压即用 | Windows 10/11 x64，需要 WebView2 Runtime |
-| `dist/MinecraftServerDownloader-win-x64` | 免安装目录版 | Windows 10/11 x64，需要 WebView2 Runtime |
 
 推荐普通用户使用 `MinecraftServerDownloader-Setup.exe`。
 
