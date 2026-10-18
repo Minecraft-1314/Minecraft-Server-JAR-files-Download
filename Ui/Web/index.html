@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title data-i18n="app.title">Minecraft Server Downloader</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="lucide.min.js" defer></script>
+  <script src="i18n.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body class="min-h-screen overflow-hidden bg-app text-ink antialiased">
+  <div id="app" class="grid h-screen grid-rows-[auto_minmax(0,1fr)_auto]">
+    <header class="glass-header z-20 border-b border-line/80 px-4 py-3 sm:px-6">
+      <div class="mx-auto flex max-w-[1800px] items-center gap-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent text-white shadow-sm"><i data-lucide="blocks" class="h-5 w-5"></i></div>
+          <div class="min-w-0">
+            <h1 class="truncate text-[15px] font-semibold leading-tight" data-i18n="app.title">Minecraft Server Downloader</h1>
+            <p id="headerSummary" class="truncate text-xs text-muted" data-i18n="app.ready">准备就绪</p>
+          </div>
+        </div>
+        <div class="ml-auto flex items-center gap-1.5">
+          <button id="headerRefreshButton" class="icon-button" type="button" data-i18n-aria="btn.refresh" data-i18n-title="btn.refresh"><i data-lucide="refresh-cw"></i></button>
+          <button id="importButton" class="icon-button" type="button" data-i18n-aria="btn.import" data-i18n-title="btn.import"><i data-lucide="plus"></i></button>
+          <label class="header-select">
+            <i data-lucide="languages" class="h-4 w-4"></i>
+            <select id="languageSelect" class="text-field" aria-label="Language">
+              <option value="auto" data-i18n="lang.auto">跟随系统</option>
+              <option value="zh-cn" data-i18n="lang.zh">中文</option>
+              <option value="en-us" data-i18n="lang.en">English</option>
+            </select>
+          </label>
+          <label class="header-select">
+            <i data-lucide="sun-moon" class="h-4 w-4"></i>
+            <select id="themeSelect" class="text-field" aria-label="Theme">
+              <option value="system" data-i18n="settings.themeSystem">跟随系统</option>
+              <option value="light" data-i18n="settings.themeLight">浅色</option>
+              <option value="dark" data-i18n="settings.themeDark">深色</option>
+            </select>
+          </label>
+          <button id="aboutButton" class="icon-button" type="button" data-i18n-aria="btn.about" data-i18n-title="btn.about"><i data-lucide="info"></i></button>
+          <button id="settingsButton" class="icon-button" type="button" data-i18n-aria="btn.settings" data-i18n-title="btn.settings"><i data-lucide="settings-2"></i></button>
+          <button id="headerStartButton" class="primary-button icon-text" type="button"><i data-lucide="play"></i><span data-i18n="btn.start">开始下载</span></button>
+        </div>
+      </div>
+      <div id="progressTrack" class="progress-track mt-3 opacity-0" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
+    </header>
+
+    <main class="workspace mx-auto grid min-h-0 w-full max-w-[1800px] gap-3 p-3 sm:gap-4 sm:p-4">
+      <aside class="glass-panel flex min-h-0 flex-col overflow-hidden rounded-xl border border-line/80 shadow-md">
+        <div class="border-b border-line/70 p-3">
+          <label class="search-field">
+            <i data-lucide="search"></i>
+            <input id="searchInput" type="search" autocomplete="off" data-i18n-placeholder="search.placeholder" data-i18n-aria="btn.search">
+            <button id="clearSearchButton" class="search-clear" type="button" hidden data-i18n-aria="btn.clearSearch"><i data-lucide="x"></i></button>
+          </label>
+          <div id="mirrorGroup" class="segmented mt-3" role="tablist">
+            <button class="segment active" type="button" data-mirror="official" data-i18n="mirror.official">官方</button>
+            <button class="segment" type="button" data-mirror="bmclapi" data-i18n="mirror.bmclapi">BMCLAPI</button>
+            <button class="segment" type="button" data-mirror="custom" data-i18n="mirror.custom">自定义</button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between px-4 pb-2 pt-3 text-xs text-muted">
+          <span data-i18n="list.versions">版本列表</span><span id="versionCount">0 / 0</span>
+        </div>
+        <div id="versionList" class="site-list min-h-0 flex-1 overflow-y-auto px-2 pb-3" role="list"></div>
+        <div id="emptyState" class="empty-state px-6 pb-6 text-center">
+          <div class="mx-auto grid h-11 w-11 place-items-center rounded-lg bg-surface-alt text-muted"><i data-lucide="package-open"></i></div>
+          <p id="emptyTitle" class="mt-3 text-sm font-medium"></p>
+          <p id="emptyCopy" class="mt-1 text-xs leading-5 text-muted"></p>
+        </div>
+      </aside>
+
+      <section class="detail-pane glass-panel min-h-0 overflow-hidden rounded-xl border border-line/80 shadow-md">
+        <div class="detail-inner">
+          <div class="section-heading">
+            <div><h2 class="text-xl font-semibold" data-i18n="detail.title">下载工作区</h2><p data-i18n="detail.copy">选择版本并管理下载任务。</p></div>
+            <div class="action-row">
+              <button id="refreshButton" class="secondary-button compact icon-text" type="button"><i data-lucide="refresh-cw"></i><span data-i18n="btn.refresh">刷新列表</span></button>
+              <button id="selectAllButton" class="secondary-button compact icon-text" type="button"><i data-lucide="list-checks"></i><span data-i18n="btn.selectAll">全选未下载</span></button>
+              <button id="clearSelectionButton" class="ghost-button compact" type="button" data-i18n="btn.clearSelection">清空选择</button>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted">
+            <span id="selectionCount" class="tone-accent status-pill">0</span>
+            <span id="downloadPath" class="mono truncate" title=""></span>
+          </div>
+
+          <div class="mt-5 rounded-lg border border-line bg-surface-alt/70 p-3">
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div><div class="field-label" data-i18n="progress.overall">总进度</div><div class="flex items-center gap-3"><div class="progress-track visible w-full"><div id="overallFill" class="progress-fill"></div></div><span id="overallText" class="mono w-16 text-right">0 / 0</span></div></div>
+              <div><div class="field-label" data-i18n="progress.bytes">字节进度</div><div class="flex items-center gap-3"><div class="progress-track visible w-full"><div id="bytesFill" class="progress-fill"></div></div><span id="bytesText" class="mono w-16 text-right">0%</span></div></div>
+            </div>
+            <div class="mt-3 flex flex-wrap justify-between gap-2 text-xs text-muted"><span id="speedText">--</span><span id="statusText" data-i18n="status.ready">准备就绪</span></div>
+          </div>
+
+          <div class="action-row mt-4">
+            <button id="startButton" class="primary-button icon-text" type="button"><i data-lucide="play"></i><span data-i18n="btn.start">开始下载</span></button>
+            <button id="pauseButton" class="secondary-button compact icon-text" type="button" disabled><i data-lucide="pause"></i><span data-i18n="btn.pause">暂停</span></button>
+            <button id="stopButton" class="ghost-button danger compact icon-text" type="button" disabled><i data-lucide="square"></i><span data-i18n="btn.stop">停止</span></button>
+            <button id="openDataButton" class="ghost-button compact icon-text" type="button"><i data-lucide="folder-open"></i><span data-i18n="btn.data">数据目录</span></button>
+          </div>
+
+          <div class="mt-5 border-t border-line pt-4">
+            <div class="section-heading"><div><h3 data-i18n="log.title">下载日志</h3><p data-i18n="log.copy">只保留最近 300 条记录。</p></div><button id="clearLogButton" class="ghost-button compact" type="button" data-i18n="btn.clearLog">清空</button></div>
+            <div id="logList" class="result-box max-h-56 overflow-y-auto whitespace-pre-wrap text-xs leading-5"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="glass-footer z-20 border-t border-line/80 px-4 py-2.5 sm:px-6">
+      <div class="mx-auto flex max-w-[1800px] flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
+        <span id="footerVersions">0 / 0</span><span id="footerSource">Official</span><span id="footerConfig" class="ml-auto"></span>
+      </div>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+  <div id="settingsOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal w-[min(560px,calc(100vw-32px))]">
+      <div class="modal-header"><div><h2 id="settingsTitle" data-i18n="settings.title">设置</h2><p data-i18n="settings.copy">保存后才会写入本地配置。</p></div><button class="icon-button" type="button" data-close="settingsOverlay" data-i18n-aria="btn.close"><i data-lucide="x"></i></button></div>
+      <div class="modal-body settings-grid">
+        <label class="field-group"><span class="field-label" data-i18n="settings.directory">下载目录</span><div class="flex gap-2"><input id="settingDirectory" class="text-field mono" type="text" maxlength="2048"><button id="chooseDirectoryButton" class="secondary-button compact" type="button" data-i18n="btn.choose">浏览</button></div></label>
+        <label class="field-group"><span class="field-label" data-i18n="settings.mirror">镜像源</span><select id="settingMirror" class="text-field"><option value="official" data-i18n="mirror.official">官方</option><option value="bmclapi" data-i18n="mirror.bmclapi">BMCLAPI</option><option value="custom" data-i18n="mirror.custom">自定义</option></select><select id="settingSource" class="text-field mt-2 hidden"></select></label>
+        <label class="field-group"><span class="field-label" data-i18n="settings.proxy">代理</span><input id="settingProxy" class="text-field mono" type="text" maxlength="2048" data-i18n-placeholder="settings.proxyHint"></label>
+        <div class="grid gap-3 sm:grid-cols-3"><label class="field-group"><span class="field-label" data-i18n="settings.concurrency">并发数</span><input id="settingConcurrency" class="text-field" type="number" min="1" max="8"></label><label class="field-group"><span class="field-label" data-i18n="settings.timeout">超时（秒）</span><input id="settingTimeout" class="text-field" type="number" min="5" max="300"></label><label class="field-group"><span class="field-label" data-i18n="settings.retry">重试次数</span><input id="settingRetry" class="text-field" type="number" min="0" max="5"></label></div>
+        <div class="grid gap-3 sm:grid-cols-2"><label class="field-group"><span class="field-label" data-i18n="settings.language">界面语言</span><select id="settingLanguage" class="text-field"><option value="auto" data-i18n="lang.auto">跟随系统</option><option value="zh-cn" data-i18n="lang.zh">中文</option><option value="en-us" data-i18n="lang.en">English</option></select></label><label class="field-group"><span class="field-label" data-i18n="settings.theme">主题</span><select id="settingTheme" class="text-field"><option value="system" data-i18n="settings.themeSystem">跟随系统</option><option value="light" data-i18n="settings.themeLight">浅色</option><option value="dark" data-i18n="settings.themeDark">深色</option></select></label></div>
+      </div>
+      <div class="modal-footer"><span id="settingsStatus" class="flex-1 text-xs text-muted"></span><button class="secondary-button" type="button" data-close="settingsOverlay" data-i18n="btn.cancel">取消</button><button id="saveSettingsButton" class="primary-button compact icon-text" type="button"><i data-lucide="save"></i><span data-i18n="btn.save">保存设置</span></button></div>
+    </div>
+  </div>
+
+  <div id="aboutOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="modal w-[min(560px,calc(100vw-32px))]">
+      <div class="modal-header"><div><h2 id="aboutTitle" data-i18n="about.title">关于</h2><p data-i18n="about.copy">版本与运行环境信息。</p></div><button class="icon-button" type="button" data-close="aboutOverlay" data-i18n-aria="btn.close"><i data-lucide="x"></i></button></div>
+      <div class="modal-body">
+        <div class="info-rows">
+          <div class="info-row"><span data-i18n="about.version">版本</span><strong id="aboutVersion">—</strong></div>
+          <div class="info-row"><span data-i18n="about.runtime">运行时 Rust</span><strong id="aboutRuntime">—</strong></div>
+          <div class="info-row"><span data-i18n="about.installPath">安装路径</span><code id="aboutInstallPath" class="mono break-all">—</code></div>
+          <div class="info-row"><span data-i18n="about.settingsPath">配置文件</span><code id="aboutSettingsPath" class="mono break-all">—</code></div>
+        </div>
+      </div>
+      <div class="modal-footer"><span class="flex-1"></span><button class="primary-button compact" type="button" data-close="aboutOverlay" data-i18n="btn.close">关闭</button></div>
+    </div>
+  </div>
+
+  <div id="importOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="modal w-[min(680px,calc(100vw-32px))]">
+      <div class="modal-header"><div><h2 id="importTitle" data-i18n="import.title">导入版本清单</h2><p data-i18n="import.copy">只需填写名称和版本清单地址，保存后即可使用。</p></div><button class="icon-button" type="button" data-close="importOverlay" data-i18n-aria="btn.close"><i data-lucide="x"></i></button></div>
+      <div class="modal-body settings-grid">
+        <label class="field-group"><span class="field-label" data-i18n="import.name">名称</span><input id="importName" class="text-field" type="text" maxlength="80" autocomplete="off"></label>
+        <label class="field-group"><span class="field-label" data-i18n="import.address">版本清单地址</span><input id="importAddress" class="text-field mono" type="url" maxlength="2048" autocomplete="off" placeholder="https://piston-meta.mojang.com/mc/game/version_manifest.json"></label>
+        <p id="importStatus" class="form-status hidden"></p>
+      </div>
+      <div class="modal-footer"><span class="flex-1"></span><button class="secondary-button" type="button" data-close="importOverlay" data-i18n="btn.cancel">取消</button><button id="importConfirmButton" class="primary-button compact icon-text" type="button"><i data-lucide="download"></i><span data-i18n="btn.importSave">保存来源</span></button></div>
+    </div>
+  </div>
+</body>
+</html>
+
+
